@@ -1,0 +1,167 @@
+/**
+ * uiTable Styles
+ * --------------
+ * These are required to make uiTable work.
+ */
+
+.cssMeasure {
+  position: absolute;
+  left: -10000px;
+  top: -10000px;
+  visibility: hidden;
+}
+
+.cssTable {
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.cssTableColumnGroup {
+  display: table-column-group;
+}
+
+.cssTableColumn {
+  display: table-column;
+}
+
+.cssTableRowGroup {
+  display: table-row-group;
+}
+
+.cssTableRow {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-row;
+}
+
+.cssTableCell {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  vertical-align: top;
+}
+
+.cssTableCellContent {
+  position: relative;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border-right: 1px solid gray;
+  border-bottom: 1px solid gray;
+  padding: 2px;
+}
+
+.cssTableColumnResize {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  width: 2px;
+  cursor: ew-resize;
+}
+
+.cssFixedContainer {
+  overflow: hidden;
+}
+
+.cssScrollContainer {
+  overflow: hidden;
+}
+
+.uiTable {
+  overflow: hidden;
+  border: 1px solid gray;
+}
+
+/* dynamic class instead of # */
+
+#scrollHeadCells .cssTableCell:last-child > .cssTableCellContent {
+  border-right: 0px !important;
+}
+
+#scrollBodyRows .cssTableRow .cssTableCell:last-child > .cssTableCellContent {
+  border-right: 0px !important;
+}
+
+#fixedRightBodyRows .cssTableRow .cssTableCell:first-child > .cssTableCellContent {
+  border-left: 1px solid gray;
+}
+
+#fixedRightHeadCells .cssTableCell:first-child > .cssTableCellContent {
+  border-left: 1px solid gray;
+}
+
+/* customization */
+
+.cssTableRow.mouseover {
+  background-color: #f8f8f8 !important;
+}
+
+.cssTableRow:nth-child(odd) {
+  background-color: #e8e8e8;
+}
+
+.cssTableRow:nth-child(even) {
+  background-color: #d8d8d8;
+}
+
+.uiScrollbarOuter {
+  position: relative;
+  background-color: #d8d8d8;
+}
+
+.uiScrollbarInner {
+  position: relative;
+  background-color: #808080;
+}
+
+#headRow {
+  background: rgb(248, 248, 248); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(216, 216, 216, 1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(248, 248, 248, 1)), color-stop(100%, rgba(216, 216, 216, 1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(216, 216, 216, 1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(216, 216, 216, 1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(216, 216, 216, 1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(248, 248, 248, 1) 0%, rgba(216, 216, 216, 1) 100%); /* W3C */
+}
+
+#headRow .cssTableCell {
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#f8f8f8', endColorstr = '#d8d8d8', GradientType = 0); /* IE6-9 */
+}
+
+#headRow .cssTableRow {
+  background-color: transparent !important;
+}
+
+#headRow .cssTableCellContent {
+  text-align: center;
+  cursor: pointer;
+}
+
+.cssTableCellContent.reorder {
+  border-right: 2px dotted red !important;
+}
+
+.cssTableColumnTools {
+  display: none;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  border-left: 1px solid #888888;
+  border-top: 1px solid #888888;
+  background-color: #e8e8e8;
+  padding-left: 2px;
+  padding-right: 3px;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 1);
+}
+
+.cssTableColumnSort {
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 1);
+}

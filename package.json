@@ -1,0 +1,28 @@
+{
+  "author": "Bernd Wessels",
+  "name": "ui-table",
+  "version": "0.0.1",
+  "homepage": "http://berndwessels.github.io/ui-table",
+  "licenses": {
+    "type": "GPL",
+    "url": "https://raw.github.com/berndwessels/ui-table/master/LICENSE"
+  },
+  "bugs": "https://github.com/berndwessels/ui-table/issues",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:berndwessels/ui-table.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4",
+    "grunt-recess": "~0.3",
+    "grunt-contrib-clean": "~0.4",
+    "grunt-contrib-jshint": "~0.4",
+    "grunt-contrib-concat": "~0.3",
+    "grunt-contrib-watch": "~0.4",
+    "grunt-contrib-uglify": "~0.2",
+    "grunt-karma": "~0.4",
+    "grunt-ngmin": "~0.0.2",
+    "grunt-contrib-copy": "~0.4.1"
+  }
+}

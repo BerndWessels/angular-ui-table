@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html ng-app="uiTableDemo" ng-controller="AppCtrl">
+<head>
+    <title>Sample 1 | ui-table</title>
+
+    <meta property="og:title" content="uiTable"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="http://bit.ly/uiTable"/>
+    <meta property="og:image"
+          content="https://a248.e.akamai.net/assets.github.com/images/modules/logos_page/Octocat.png?1366128846"/>
+    <meta name="og:description" content="A faster and better angular data grid. Trust me. It's epic.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@berndwessels">
+    <meta name="twitter:creator" content="@berndwessels">
+    <meta name="twitter:title" content="uiTable">
+    <meta name="twitter:image"
+          content="https://a248.e.akamai.net/assets.github.com/images/modules/logos_page/Octocat.png?1366128846">
+    <meta name="twitter:description" content="A faster and better angular data grid. Trust me. It's epic.">
+
+    <!-- your compiled CSS -->
+    <link rel="stylesheet" type="text/css" href="<%= grunt.config.get('pkg.name') %>-demo.css"/>
+
+    <!-- libs.js contains all of the concatenated third-party libraries -->
+    <script type="text/javascript" src="libs.js"></script>
+
+    <!-- this is your compiled, minified application code -->
+    <script type="text/javascript" src="<%= grunt.config.get('pkg.name') %>.js"></script>
+
+    <!-- it's stupid to have to load it here, but this is for the +1 button -->
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+        {
+            "parsetags"
+        :
+            "explicit"
+        }
+    </script>
+
+    <!-- inline demo code -->
+    <script type="text/javascript">
+        angular.module('uiTableDemo', ['uiTable'])
+                .controller
+                (
+                        'AppCtrl',
+                        [
+                            '$scope', '$element',
+                            function ($scope, $element, $transclude) {
+                                // This context.
+                                var controller = this;
+                                // The table options.
+                                var options = {
+                                    //noCellBinding: true,  // use this on IE8 or very slow hardware. Your cells will not be data bound but use simple string replacement.
+                                    //rowsHeight:24,        // use this to disable the dynamic row height feature (improves performance).
+                                    columnsWidth:2000,      // use this to set the available with for all columns (useful for star-based layouts).
+                                    columns:[],
+                                    data:[]                 // can be an array of row data or a function that receives the row index and returns the data for the requested row.
+                                    //total:100             // in case data is a function, total has to indicate the total number of rows available.
+                                };
+                                for (var j = 0; j < 4; j++) {
+                                    options.columns.push({
+                                        title:'title ' + j + ' bernd',
+                                        field:'field' + j,
+                                        sort:'asc',
+                                        sortOrder:j + 1,
+                                        width:'50',
+                                        fixed:'left',
+                                        headTemplate:'',
+                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
+                                    });
+                                }
+                                for (; j < 10; j++) {
+                                    options.columns.push({
+                                        title:'title ' + j + ' bernd',
+                                        field:'field' + j,
+                                        sort:'',
+                                        sortOrder:0,
+                                        width:'50',
+                                        fixed:'',
+                                        headTemplate:'',
+                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
+                                    });
+                                }
+                                for (; j < 12; j++) {
+                                    options.columns.push({
+                                        title:'title ' + j + ' bernd',
+                                        field:'field' + j,
+                                        sort:'',
+                                        sortOrder:0,
+                                        width:'50',
+                                        fixed:'right',
+                                        headTemplate:'',
+                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
+                                    });
+                                }
+                                options.columns[2].width = '2*';
+                                options.columns[5].width = '1*';
+                                options.columns[11].width = '1*';
+                                for (var i = 0; i < 1000; i++) {
+                                    var data = {};
+                                    for (var j = 0; j < 20; j++) {
+                                        data['field' + j] = i + ':' + j;
+                                    }
+                                    options.data.push(data);
+                                }
+                                options.columns[6].headTemplate = '<span>*<span ng-bind="column.title"></span>*</span>';
+                                options.columns[7].dataTemplate = '<span>*<span ng-bind="row.data.field7"></span>*</span>';
+                                $scope.tableOptions = options;
+                                $scope.onClack = function () {
+                                    $scope.tableOptions.data[4]['field4'] = 'Brummmmmmmmm';
+                                    $scope.tableOptions.scrollV = 11;
+                                };
+                                $scope.onClick = function () {
+                                    $scope.tableOptions.data[4]['field4'] += ' dfg';
+                                };
+                            }
+                        ]
+                )
+                .directive
+                (
+                        'plusOne',
+                        function () {
+                            return {
+                                link:function (scope, element, attrs) {
+                                    gapi.plusone.render(element[0], {
+                                                "size":"medium",
+                                                "href":"http://bit.ly/uiTable"
+                                            }
+                                    );
+                                }
+                            };
+                        }
+                );
+    </script>
+</head>
+<body>
+<input class="btn" type="button" ng-click="onClick()" value="click"/>
+<input class="btn" type="button" ng-click="onClack()" value="clack"/>
+<br/>
+
+<div style="margin: 20px; background-color: white; width: 70%; height: 80%; position: relative;">
+    <div class="uiTable" ui-table-options="tableOptions" style="width:100%; height: 100%;">
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,298 @@
+/**
+ * Demo Styles
+ * -----------
+ * These styles make the demo attractive rather than just functional.
+ */
+
+/*
+ * Just to make the demo look pretty, we import Twitter Bootstrap,
+ * Font Awesome, and Rainbow (to highlight the code demos).
+ */
+
+@import '../vendor/bootstrap/less/bootstrap.less';
+@import '../vendor/font-awesome/build/assets/font-awesome/less/font-awesome.less';
+@import '../vendor/google-code-prettify/src/prettify.css';
+
+/*
+ * Overwrite the path to reflect our project structure.
+ */
+
+@FontAwesomePath: "./font";
+
+/*
+ * Make things beautiful.
+ */
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  overflow-x: hidden;
+}
+
+input {
+  box-sizing: border-box;
+}
+
+input[type=text] {
+  height: 100%;
+}
+
+/*
+ * Pretty Print
+ */
+
+.com { color: #93a1a1; }
+.lit { color: #195f91; }
+.pun, .opn, .clo { color: #93a1a1; }
+.fun { color: #dc322f; }
+.str, .atv { color: #D14; }
+.kwd, .prettyprint .tag { color: #1e347b; }
+.typ, .atn, .dec, .var { color: teal; }
+.pln { color: #48484c; }
+
+.prettyprint {
+  padding: 8px;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+.prettyprint.linenums {
+  -webkit-box-shadow: inset 40px 0 0 #fbfbfc, inset 41px 0 0 #ececf0;
+  -moz-box-shadow: inset 40px 0 0 #fbfbfc, inset 41px 0 0 #ececf0;
+  box-shadow: inset 40px 0 0 #fbfbfc, inset 41px 0 0 #ececf0;
+}
+
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums {
+  margin: 0 0 0 33px; /* IE indents via margin-left */
+}
+ol.linenums li {
+  padding-left: 12px;
+  color: #bebec5;
+  line-height: 20px;
+  text-shadow: 0 1px 0 #fff;
+}
+
+/*
+ * Shamelessly stolen demo style.
+ */
+
+/*
+ * Fonts
+ */
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/DXI1ORHCpsQm3Vp6mXoaTXhCUOGz7vYGh680lGh-uXM.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Quicksand Light'), local('Quicksand-Light'), url(http://themes.googleusercontent.com/static/fonts/quicksand/v2/qhfoJiLu10kFjChCCTvGlHhCUOGz7vYGh680lGh-uXM.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Quicksand Regular'), local('Quicksand-Regular'), url(http://themes.googleusercontent.com/static/fonts/quicksand/v2/sKd0EMYPAh5PYCRKSryvWz8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Quicksand Bold'), local('Quicksand-Bold'), url(http://themes.googleusercontent.com/static/fonts/quicksand/v2/32nyIRHyCu6iqEka_hbKsnhCUOGz7vYGh680lGh-uXM.woff) format('woff');
+}
+
+@headerFontFamily: 'Quicksand', sans-serif;
+@baseFontFamily: 'Open Sans', sans-serif;
+
+/**
+ * Typography
+ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: @headerFontFamily;
+}
+
+.header {
+  margin-bottom: 30px;
+  font-size: 50px;
+  line-height: 1.2;
+  color: @white;
+  font-family: @headerFontFamily;
+}
+
+.massive-icon {
+  font-size: 300px;
+  line-height: 1;
+  color: @white;
+}
+
+pre {
+  margin: 20px 0;
+}
+
+code {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  .border-radius( 4px );
+  background-color: #2a211c;
+  color: #bdae9d;
+}
+
+.block {
+  margin-bottom: 60px;
+  text-align: justify;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.social-buttons {
+  margin-top: 20px;
+}
+
+.row {
+  margin-bottom: 50px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/**
+ * The section appearances.
+ */
+
+@color1: #6699cc;
+@color2: #FF6B6B;
+@color3: #FFB56B;
+
+.section-cover {
+  display: table;
+  width: 100%;
+}
+
+.section-cover, .section-footer {
+  background-color: @color1;
+
+  a {
+    color: @color3;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+      color: @color2;
+    }
+  }
+}
+
+.section-about {
+  background-color: @color2;
+
+  a {
+    color: @color3;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+      color: @color1;
+    }
+  }
+}
+
+.section-usage {
+  background-color: @color3;
+
+  a {
+    color: @color2;
+    font-weight: bold;
+  }
+}
+
+.section-inner {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 50px 0;
+}
+
+/**
+ * Jumbotron
+ */
+
+.jumbotron {
+  font-family: @headerFontFamily;
+  color: #FFF;
+  line-height: 1.2;
+  text-align: center;
+
+  .brand {
+    font-size: 100px;
+  }
+
+  .tagline {
+    margin-top: 30px;
+    font-size: 24px;
+  }
+}
+
+.scroll-icon {
+  @iconSize: 75px;
+  display: table;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  margin-left: -(@iconSize / 2);
+  width: @iconSize;
+  height: @iconSize;
+  border-radius: @iconSize;
+  background-color: #FFF;
+
+  .inner {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    color: @color1;
+    font-size: 32px;
+    font-weight: bold;
+  }
+}
+
+/**
+ * Social links
+ */
+
+.social {
+  margin-top: 30px;
+
+  a {
+    color: @white !important;
+    font-size: 36px;
+
+    &:hover {
+      color: @color2 !important;
+    }
+  }
+}
+

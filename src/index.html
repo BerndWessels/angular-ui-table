@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html ng-app="uiTableDemo" ng-controller="AppCtrl">
+<head>
+    <title>ui-table</title>
+
+    <meta property="og:title" content="uiTable"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="http://bit.ly/uiTable"/>
+    <meta property="og:image"
+          content="https://a248.e.akamai.net/assets.github.com/images/modules/logos_page/Octocat.png?1366128846"/>
+    <meta name="og:description" content="A faster and better angular data grid. Trust me. It's epic.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@berndwessels">
+    <meta name="twitter:creator" content="@berndwessels">
+    <meta name="twitter:title" content="uiTable">
+    <meta name="twitter:image"
+          content="https://a248.e.akamai.net/assets.github.com/images/modules/logos_page/Octocat.png?1366128846">
+    <meta name="twitter:description" content="A faster and better angular data grid. Trust me. It's epic.">
+
+    <!-- your compiled CSS -->
+    <link rel="stylesheet" type="text/css" href="<%= grunt.config.get('pkg.name') %>-demo.css"/>
+
+    <!-- external CSS -->
+    <!--
+    <link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.css"/>
+    -->
+
+    <!-- libs.js contains all of the concatenated third-party libraries -->
+    <script type="text/javascript" src="libs.js"></script>
+
+    <!-- external JS -->
+    <!--
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js"></script>
+    -->
+
+    <!-- this is your compiled, minified application code -->
+    <script type="text/javascript" src="<%= grunt.config.get('pkg.name') %>.js"></script>
+
+    <!-- it's stupid to have to load it here, but this is for the +1 button -->
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+        {
+            "parsetags"
+        :
+            "explicit"
+        }
+    </script>
+
+    <!-- inline demo code -->
+    <script type="text/javascript">
+        angular.module('uiTableDemo', ['uiTable'])
+                .controller
+                (
+                        'AppCtrl',
+                        [
+                            '$scope', '$element',
+                            function ($scope, $element, $transclude) {
+                                // This context.
+                                var controller = this;
+                                // The table options.
+                                var options = {
+                                    // use this on IE8 or very slow hardware.
+                                    // Your cells will not be data bound but use simple string replacement.
+                                    //noCellBinding: true,
+                                    // use this to disable the dynamic row height feature
+                                    // (improves performance).
+                                    //rowsHeight:24,
+                                    // use this to set the available with for all columns
+                                    // (useful for star-based layouts).
+                                    columnsWidth:1600,
+                                    columns:[],
+                                    // can be an array of row data or a function that receives the row index
+                                    // and returns the data for the requested row.
+                                    data:[],
+                                    // in case data is a function,
+                                    // total has to indicate the total number of rows available.
+                                    //total:100
+                                    // the selected rows data.
+                                    selection:[],
+                                    // allow the selection of multiple rows with the
+                                    // SHIFT and CTRL keys.
+                                    allowMultiSelection: true
+                                };
+                                // Create 4 fixed left columns.
+                                for (var j = 0; j < 4; j++) {
+                                    options.columns.push({
+                                        title:'Column ' + j,
+                                        field:'field' + j,
+                                        sort:'',
+                                        sortOrder:0,
+                                        width:'50',
+                                        fixed:'left',
+                                        headTemplate:'',
+                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
+                                    });
+                                }
+                                // Create 6 scroll columns.
+                                for (; j < 10; j++) {
+                                    options.columns.push({
+                                        title:'Column ' + j,
+                                        field:'field' + j,
+                                        sort:'',
+                                        sortOrder:0,
+                                        width:'50',
+                                        fixed:'',
+                                        headTemplate:'',
+                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
+                                    });
+                                }
+                                // Create 2 fixed right columns.
+                                for (; j < 12; j++) {
+                                    options.columns.push({
+                                        title:'Column ' + j,
+                                        field:'field' + j,
+                                        sort:'',
+                                        sortOrder:0,
+                                        width:'50',
+                                        fixed:'right',
+                                        headTemplate:'',
+                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
+                                    });
+                                }
+                                // Init a default sort order.
+                                options.columns[2].sort = 'asc';
+                                options.columns[2].sortOrder = 1;
+                                options.columns[4].sort = 'desc';
+                                options.columns[4].sortOrder = 3;
+                                options.columns[5].sort = 'asc';
+                                options.columns[5].sortOrder = 2;
+                                // Set some relative column widths.
+                                options.columns[2].width = '2*';
+                                options.columns[6].width = '1*';
+                                options.columns[7].width = '1*';
+                                options.columns[11].width = '1*';
+                                // Fill the data array.
+                                for (var i = 0; i < 100; i++) {
+                                    var data = {};
+                                    for (var j = 0; j < 20; j++) {
+                                        data['field' + j] = i + ':' + j;
+                                    }
+                                    options.data.push(data);
+                                }
+                                // Set a column cell template.
+                                options.columns[6].headTemplate = '<span>*<span ng-bind="column.title"></span>*</span>';
+                                // Set a data cell template.
+                                options.columns[7].dataTemplate = '<span>*<span ng-bind="row.data.field7"></span>*</span>';
+                                // Assign the options.
+                                $scope.tableOptions = options;
+                                // Test
+                                $scope.onClack = function () {
+                                    $scope.tableOptions.data[4]['field4'] = 'Brummmmmmmmm';
+                                    $scope.tableOptions.scrollV = 11;
+                                };
+                                $scope.onClick = function () {
+                                    $scope.tableOptions.data[4]['field4'] += ' dfg';
+                                };
+                            }
+                        ]
+                )
+                .directive
+                (
+                        'plusOne',
+                        function () {
+                            return {
+                                link:function (scope, element, attrs) {
+                                    gapi.plusone.render(element[0], {
+                                                "size":"medium",
+                                                "href":"http://bit.ly/uiTable"
+                                            }
+                                    );
+                                }
+                            };
+                        }
+                );
+    </script>
+</head>
+<body onload="prettyPrint();">
+<!-- HOME -->
+<div class="section-cover">
+    <div class="section-inner jumbotron">
+        <div class="container">
+            <div class="brand">uiTable</div>
+            <div class="social-buttons">
+                <ul class="inline">
+                    <li>
+                        <iframe
+                                src="http://ghbtns.com/github-btn.html?user=joshdmiller&amp;repo=ng-curtain&amp;type=watch&amp;count=true"
+                                allowtransparency="true"
+                                frameborder="0"
+                                scrolling="0"
+                                width="110"
+                                height="20">
+                        </iframe>
+                    </li>
+                    <li>
+                        <iframe
+                                src="http://ghbtns.com/github-btn.html?user=joshdmiller&amp;repo=ng-curtain&amp;type=fork&amp;count=true"
+                                allowtransparency="true"
+                                frameborder="0"
+                                scrolling="0"
+                                width="95"
+                                height="20">
+                        </iframe>
+                    </li>
+                    <li>
+                        <iframe allowtransparency="true" frameborder="0" scrolling="no"
+                                src="https://platform.twitter.com/widgets/tweet_button.html?url=http%3A%2F%2Fbit.ly%2FngCurtain&counturl=http%3A%2F%2Fjoshdmiller.github.io%2Fng-curtain&text=Check%20out%20ng-curtain%20-%20a%20wicked-cool%20unrolling%20effect%20for%20web%20sites%20%7C&hashtags=angularjs&via=joshdmiller&related=joshdmiller"
+                                style="width:130px; height:20px;"></iframe>
+                    </li>
+                    <li plus-one></li>
+                    <li>
+                        <div id="fb-root"></div>
+                        <script>(function (d, s, id) {
+                            var js, fjs = d.getElementsByTagName(s)[0];
+                            if (d.getElementById(id)) return;
+                            js = d.createElement(s);
+                            js.id = id;
+                            js.src = "http://connect.facebook.net/en_US/all.js#xfbml=1";
+                            fjs.parentNode.insertBefore(js, fjs);
+                        }(document, 'script', 'facebook-jssdk'));</script>
+                        <fb:like href="http://bit.ly/ngCurtain" send="true" layout="button_count" width="90"
+                                 show_faces="true"></fb:like>
+                    </li>
+                    <li>
+                        <script src="http://platform.linkedin.com/in.js" type="text/javascript">
+                            lang: en_US
+                        </script>
+                        <script type="IN/Share" data-url="http://bit.ly/ngCurtain" data-counter="right"></script>
+                    </li>
+                </ul>
+            </div>
+            <div class="tagline">
+                A faster and better <a href="http://angularjs.org">AngularJS</a> data grid.
+            </div>
+            <div class="tagline">
+                Trust me (Bernd Wessels). It's epic.
+            </div>
+        </div>
+    </div>
+</div>
+<br/>
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#">Overview</a></li>
+    <li><a href="#">Bound Cells</a></li>
+    <li><a href="#">Unbound Cells</a></li>
+    <li><a href="#">Fixed Row Height</a></li>
+    <li><a href="#">On Demand</a></li>
+    <li><a href="#">Hierarchical</a></li>
+</ul>
+<div style="float: left; width: 49%;">
+    <h2>Features</h2>
+    <ol>
+        <li>Column Templates</li>
+        <li>Cell Templates</li>
+        <li>Fixed Left AND Right Columns</li>
+        <li>Fixed AND Dynamic Row Height</li>
+        <li>Column Reordering</li>
+        <li>Column Resizing</li>
+        <li>Multiple Column Sorting with Order Indication</li>
+        <li>Bound AND Unbound Cell Rendering</li>
+        <li>Easy Extensible through Indexed Row Request Callback</li>
+    </ol>
+    <br/>
+
+    <h2>Getting Started</h2>
+    <ol>
+        <li>Add references to <a href="http://code.jquery.com/">jQuery</a> and <a
+                href="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js">AngularJS</a>.
+        </li>
+        <li>Add references to <a href="https://github.com/angular-ui/ui-table">uiTable</a>'s javascript and css files.
+        </li>
+        <li>Add uiTable to your application module's dependencies:<br/><code>angular.module('myApp',['uiTable']);</code>
+        </li>
+        <li>In your html file within the controller where you plan to use ui-table, add:<br><code>&lt;div
+            class="gridStyle" ui-table="tableOptions"&gt;&lt;/div&gt;</code><br>tableOptions is the variable we are
+            going to bind to where we will initialize our grid options.
+        </li>
+    </ol>
+
+    <h2>CSS</h2>
+    <pre class="prettyprint lang-css linenums">
+        .gridStyle {
+            border: 1px solid rgb(212,212,212);
+            width: 800px;
+            height: 400px;
+        }
+    </pre>
+    <h2>HTML</h2>
+    <pre class="prettyprint lang-html linenums">
+        &lt;html ng-app="myApp"&gt;
+            &lt;head lang="en"&gt;
+                &lt;meta charset="utf-8"&gt;
+                &lt;title&gt;Getting Started With uiTable Example&lt;/title&gt;
+                &lt;link rel="stylesheet" type="text/css" href="ui-table.css"/&gt;
+                &lt;link rel="stylesheet" type="text/css" href="style.css"/&gt;
+                &lt;script type="text/javascript" src="jquery.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="angular.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="hamster.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="mousewheel.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="ui-table.js"&gt;&lt;/script&gt;
+            &lt;/head&gt;
+            &lt;body ng-controller="MyCtrl"&gt;
+                &lt;div class="gridStyle" ui-table="tableOptions"&gt;
+                &lt;/div&gt;
+            &lt;/body&gt;
+        &lt;/html&gt;
+    </pre>
+</div>
+
+<div style="float: right; width: 49%;">
+    <h2>JavaScript</h2>
+    <pre class="prettyprint lang-js linenums">
+        // main.js
+        var app = angular.module('myApp', ['uiTable']);
+        app.controller('MyCtrl', function($scope) {
+            $scope.tableOptions = {
+                // Use this on IE8 or very slow hardware.
+                // Your cells will not be data bound
+                // but use simple string replacement.
+                //noCellBinding: true,
+                // Use this to disable the dynamic row height feature
+                // (improves rendering performance).
+                //rowsHeight:24,
+                // use this to set the available with for all columns
+                // (useful for star-based layouts).
+                //columnsWidth:1600,
+                // Use headTemplate to define the column header cell template.
+                // Use dataTemplate to define the data cell template for this column.
+                columns:[
+                    {
+                        title:'First Name', field:'firstName',
+                        sort:'', sortOrder:0,
+                        width:'1*', fixed:'',
+                        headTemplate:'', dataTemplate:''
+                    },
+                    {
+                        title:'Last Name', field:'lastName',
+                        sort:'', sortOrder:0,
+                        width:'2*', fixed:'',
+                        headTemplate:'', dataTemplate:''
+                    },
+                    {
+                        title:'First Name', field:'firstName',
+                        sort:'', sortOrder:0,
+                        width:'50px', fixed:'',
+                        headTemplate:'', dataTemplate:''
+                    }
+                ],
+                // can be an array of row data or a function
+                // that receives the row index and
+                // returns the data for the requested row.
+                data:[
+                    {firstName:"Walter", lastName:"Wurst", age:20},
+                    {firstName:"Peter", lastName:"Pan", age:21},
+                    {firstName:"Erwin", lastName:"Erster", age:22},
+                    {firstName:"Paula", lastName:"Pummel", age:23}
+                ],
+                // in case data is a function,
+                // total has to indicate the total number of rows available.
+                //total:100,
+                // the selected rows data.
+                selection: [],
+                // allow the selection of multiple rows with the
+                // SHIFT and CTRL keys.
+                allowMultiSelection: true
+            };
+        });
+    </pre>
+</div>
+
+<div style="clear: both;">
+    <div style="margin-left: auto; margin-right: auto; width: 80%; height: 400px; position: relative;">
+        <div class="uiTable" ui-table-options="tableOptions" style="width:100%; height: 100%;">
+        </div>
+    </div>
+</div>
+
+<br/>
+
+</body>
+</html>
