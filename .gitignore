@@ -1,5 +1,12 @@
 .idea/
+node_modules/
+vendor/
 vendor/angular/
+vendor/angular-mousewheel/
 vendor/angular-unstable/
 vendor/angular-mocks/
-node_modules/
+vendor/bootstrap/
+vendor/font-awesome/
+vendor/google-code-prettify/
+vendor/hamsterjs/
+vendor/jquery/
