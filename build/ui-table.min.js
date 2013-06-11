@@ -1,5 +1,5 @@
 /**
- * ui-table - v0.0.1 - 2013-05-30
+ * ui-table - v0.0.1 - 2013-06-07
  * http://berndwessels.github.io/ui-table
  *
  * Copyright (c) 2013 Bernd Wessels

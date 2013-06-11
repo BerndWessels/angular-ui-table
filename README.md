@@ -1,8 +1,12 @@
-# [uiTable](http://berndwessels.github.io/ui-table)
+# [uiTable](http://berndwessels.github.io/angular-ui-table)
 
 A faster and better AngularJS data grid.
 
 ***
+
+## Examples
+
+See uiTable in action here [http://berndwessels.github.io/angular-ui-table](http://berndwessels.github.io/angular-ui-table).
 
 ## Usage
 
