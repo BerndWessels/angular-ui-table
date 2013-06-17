@@ -104,6 +104,10 @@
   background-color: #f8f8f8 !important;
 }
 
+.cssTableRow.selected {
+  background-color: lightsteelblue !important;
+}
+
 .cssTableRow:nth-child(odd) {
   background-color: #e8e8e8;
 }

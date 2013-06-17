@@ -287,11 +287,14 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                     }
                 };
                 controller.createRow = function (rowIndex, rowData) {
+                    // Get the row's selection status.
+                    var selection = $scope.uiTableOptions.selection[rowIndex];
+                    var isSelected = selection ? selection.isSelected : false;
                     // Create the row html.
-                    var measureRowHtml = '<div class="cssTableRow">';
-                    var fixedLeftRowHtml = '<div class="cssTableRow">';
-                    var fixedRightRowHtml = '<div class="cssTableRow">';
-                    var scrollRowHtml = '<div class="cssTableRow">';
+                    var measureRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
+                    var fixedLeftRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
+                    var fixedRightRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
+                    var scrollRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
                     $.each($scope.columnScopes, function (index, columnScope) {
                         // Get the data template.
                         var dataTemplate = (columnScope.column.dataTemplate && columnScope.column.dataTemplate.length > 0) ? columnScope.column.dataTemplate : '<span ng-bind="row.data.' + columnScope.column.field + '"></span>';
@@ -318,8 +321,9 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                     });
                     // Create a new row scope.
                     var rowScope = $scope.$new();
+                    // Initialize the row scope.
+                    rowScope.row = {index: rowIndex, data: rowData, isSelected: isSelected};
                     // Initialize the scope's bindings.
-                    rowScope.row = {index:rowIndex, data:rowData};
                     if ($scope.uiTableOptions.noCellBinding) {
                         // Create the fixed left row if necessary.
                         if ($scope.numberOfColumnsFixedLeft > 0) {
@@ -347,7 +351,7 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                         }
                         // Create the scroll row.
                         rowScope.scrollRowElement = $compile(scrollRowHtml + '</div>')(rowScope);
-                        // Bind the hover event to the fixed left row.
+                        // Bind row events to the fixed left row.
                         if (rowScope.fixedLeftRowElement) {
                             rowScope.fixedLeftRowElement.bind('mouseenter.cssTableRow', function () {
                                 rowScope.fixedLeftRowElement.addClass('mouseover');
@@ -363,8 +367,11 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                                 }
                                 rowScope.scrollRowElement.removeClass('mouseover');
                             });
+                            rowScope.fixedLeftRowElement.bind('click.cssTableRow', function (event) {
+                                controller.onClickRow(event, rowScope);
+                            });
                         }
-                        // Bind the hover event to the fixed right row.
+                        // Bind the row events to the fixed right row.
                         if (rowScope.fixedRightRowElement) {
                             rowScope.fixedRightRowElement.bind('mouseenter.cssTableRow', function () {
                                 rowScope.fixedRightRowElement.addClass('mouseover');
@@ -380,8 +387,11 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                                 }
                                 rowScope.scrollRowElement.removeClass('mouseover');
                             });
+                            rowScope.fixedRightRowElement.bind('click.cssTableRow', function (event) {
+                                controller.onClickRow(event, rowScope);
+                            });
                         }
-                        // Bind the hover event to the scroll row.
+                        // Bind the row events to the scroll row.
                         rowScope.scrollRowElement.bind('mouseenter.cssTableRow', function () {
                             if (rowScope.fixedLeftRowElement) {
                                 rowScope.fixedLeftRowElement.addClass('mouseover');
@@ -399,6 +409,9 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                                 rowScope.fixedRightRowElement.removeClass('mouseover');
                             }
                             rowScope.scrollRowElement.removeClass('mouseover');
+                        });
+                        rowScope.scrollRowElement.bind('click.cssTableRow', function (event) {
+                            controller.onClickRow(event, rowScope);
                         });
                     }
                     if ($scope.rows.length === 0) {
@@ -473,25 +486,25 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                     // Add a watcher to the measurement row if necessary.
                     if (rowScope.measureRowElement) {
                         rowScope.$watch
-                            (
-                                function () {
-                                    // Check if the height of any cell has changed.
-                                    return rowScope.measureRowElement.height();
-                                },
-                                function (newValue) {
-                                    // Align all cell heights.
-                                    if (rowScope.fixedLeftRowElement) {
-                                        $('div.cssTableCellContent', rowScope.fixedLeftRowElement).css({height:newValue});
-                                    }
-                                    if (rowScope.fixedRightRowElement) {
-                                        $('div.cssTableCellContent', rowScope.fixedRightRowElement).css({height:newValue});
-                                    }
-                                    $('div.cssTableCellContent', rowScope.scrollRowElement).css({height:newValue});
-                                    rowScope.height = newValue;
-                                    // Update all necessary rows.
-                                    controller.renderRow(rowIndex);
+                        (
+                            function () {
+                                // Check if the height of any cell has changed.
+                                return rowScope.measureRowElement.height();
+                            },
+                            function (newValue) {
+                                // Align all cell heights.
+                                if (rowScope.fixedLeftRowElement) {
+                                    $('div.cssTableCellContent', rowScope.fixedLeftRowElement).css({height: newValue});
                                 }
-                            );
+                                if (rowScope.fixedRightRowElement) {
+                                    $('div.cssTableCellContent', rowScope.fixedRightRowElement).css({height: newValue});
+                                }
+                                $('div.cssTableCellContent', rowScope.scrollRowElement).css({height: newValue});
+                                rowScope.height = newValue;
+                                // Update all necessary rows.
+                                controller.renderRow(rowIndex);
+                            }
+                        );
                     }
                     else if ($scope.uiTableOptions.noCellBinding) {
                         // Calculate the row height.
@@ -502,24 +515,24 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                         );
                         // Align all cell heights.
                         if (rowScope.fixedLeftRowElement) {
-                            $('div.cssTableCellContent', rowScope.fixedLeftRowElement).css({height:rowHeight});
+                            $('div.cssTableCellContent', rowScope.fixedLeftRowElement).css({height: rowHeight});
                         }
                         if (rowScope.fixedRightRowElement) {
-                            $('div.cssTableCellContent', rowScope.fixedRightRowElement).css({height:rowHeight});
+                            $('div.cssTableCellContent', rowScope.fixedRightRowElement).css({height: rowHeight});
                         }
-                        $('div.cssTableCellContent', rowScope.scrollRowElement).css({height:rowHeight});
+                        $('div.cssTableCellContent', rowScope.scrollRowElement).css({height: rowHeight});
                         rowScope.height = rowHeight;
                     }
                     // Set the fixed row height.
                     else {
                         // Align all cell heights.
                         if (rowScope.fixedLeftRowElement) {
-                            $('div.cssTableCellContent', rowScope.fixedLeftRowElement).css({height:$scope.uiTableOptions.rowsHeight});
+                            $('div.cssTableCellContent', rowScope.fixedLeftRowElement).css({height: $scope.uiTableOptions.rowsHeight});
                         }
                         if (rowScope.fixedRightRowElement) {
-                            $('div.cssTableCellContent', rowScope.fixedRightRowElement).css({height:$scope.uiTableOptions.rowsHeight});
+                            $('div.cssTableCellContent', rowScope.fixedRightRowElement).css({height: $scope.uiTableOptions.rowsHeight});
                         }
-                        $('div.cssTableCellContent', rowScope.scrollRowElement).css({height:$scope.uiTableOptions.rowsHeight});
+                        $('div.cssTableCellContent', rowScope.scrollRowElement).css({height: $scope.uiTableOptions.rowsHeight});
                         rowScope.height = $scope.uiTableOptions.rowsHeight;
                     }
                     $scope.vScrollbarOptions.page++;
@@ -568,6 +581,45 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                         $scope.hScrollbarOptions.position = newPosition < 0 ? 0 : newPosition;
                     }
                 };
+                // Handle the row click event.
+                controller.onClickRow = function (event, rowScope) {
+                    $scope.$apply(function () {
+                        if (event.shiftKey === false && event.ctrlKey === false) {
+                            // Deselect all rows.
+                            $scope.uiTableOptions.selection.length = 0;
+                            $.each($scope.rows, function (index, iRowScope) {
+                                if (iRowScope.row.isSelected) {
+                                    iRowScope.row.isSelected = false;
+                                    if (iRowScope.fixedLeftRowElement) {
+                                        iRowScope.fixedLeftRowElement.removeClass('selected');
+                                    }
+                                    if (iRowScope.fixedRightRowElement) {
+                                        iRowScope.fixedRightRowElement.removeClass('selected');
+                                    }
+                                    iRowScope.scrollRowElement.removeClass('selected');
+                                }
+                            });
+                            // Select the clicked row.
+                            $scope.uiTableOptions.selection[rowScope.row.index] = rowScope.row;
+                            if (!rowScope.row.isSelected) {
+                                rowScope.row.isSelected = true;
+                                if (rowScope.fixedLeftRowElement) {
+                                    rowScope.fixedLeftRowElement.addClass('selected');
+                                }
+                                if (rowScope.fixedRightRowElement) {
+                                    rowScope.fixedRightRowElement.addClass('selected');
+                                }
+                                rowScope.scrollRowElement.addClass('selected');
+                            }
+                        }
+                        else if (event.shiftKey === true && event.ctrlKey === false) {
+                            // Select from to. TODO
+                        }
+                        else if (event.ctrlKey === false) {
+                            // Toggle clicked. TODO
+                        }
+                    });
+                };
                 // Helper to determine over which column the mouse currently is.
                 controller.currentMouseColumnScope = null;
             }
@@ -580,13 +632,13 @@ angular.module('uiTable', ['monospaced.mousewheel'])
             '$window', '$timeout', '$rootScope', '$compile',
             function ($window, $timeout, $rootScope, $compile) {
                 return {
-                    controller:'uiTableController',
-                    restrict:'C',
-                    scope:{uiTableOptions:'='},
-                    template:'<div class="cssTable cssMeasure">\n    <div class="cssTableColumnGroup" id="measureHeadColumns">\n        <!-- each col in cols -->\n    </div>\n    <div class="cssTableRowGroup" id="measureHeadCells">\n        <!-- each row in rows -->\n    </div>\n</div>\n<div class="cssTable cssMeasure">\n    <div class="cssTableColumnGroup" id="measureBodyColumns">\n        <!-- each col in cols -->\n    </div>\n    <div class="cssTableRowGroup" id="measureBodyRows">\n        <!-- each row in rows -->\n    </div>\n</div>\n<div class="cssTable" msd-wheel="onMouseWheel($event, $delta, $deltaX, $deltaY)">\n    <div class="cssTableRowGroup">\n        <div class="cssTableRow" id="headRow">\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedLeft > 0">\n                <!-- fixed left headers -->\n                <div class="cssTable">\n                    <div class="cssTableColumnGroup" id="fixedLeftHeadColumns">\n                        <!-- each col in fixedCols -->\n                    </div>\n                    <div class="cssTableRowGroup">\n                        <div class="cssTableRow" id="fixedLeftHeadCells">\n                            <!-- each col in fixedCols -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n                <!-- scroll headers -->\n                <div class="cssScrollContainer" id="scrollHeadContainer">\n                    <div class="cssTable" id="scrollHeadTable">\n                        <div class="cssTableColumnGroup" id="scrollHeadColumns">\n                            <!-- each col in scrollCols -->\n                        </div>\n                        <div class="cssTableRowGroup">\n                            <div class="cssTableRow" id="scrollHeadCells">\n                                <!-- each col in scrollCols -->\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedRight > 0">\n                <!-- fixed right headers -->\n                <div class="cssTable">\n                    <div class="cssTableColumnGroup" id="fixedRightHeadColumns">\n                        <!-- each col in fixedCols -->\n                    </div>\n                    <div class="cssTableRowGroup">\n                        <div class="cssTableRow" id="fixedRightHeadCells">\n                            <!-- each col in fixedCols -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n            </div>\n        </div>\n        <div class="cssTableRow">\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedLeft > 0">\n                <!-- fixed left body -->\n                <div class="cssFixedContainer" id="fixedLeftBodyContainer">\n                    <div class="cssTable">\n                        <div class="cssTableColumnGroup" id="fixedLeftBodyColumns">\n                            <!-- each col in fixedCols -->\n                        </div>\n                        <div class="cssTableRowGroup" id="fixedLeftBodyRows">\n                            <!-- each row in rows -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n                <!-- scroll body -->\n                <div class="cssScrollContainer" id="scrollBodyContainer" style="float:left;">\n                    <div class="cssTable" id="scrollBodyTable">\n                        <div class="cssTableColumnGroup" id="scrollBodyColumns">\n                            <!-- each col in scrollCols -->\n                        </div>\n                        <div class="cssTableRowGroup" id="scrollBodyRows">\n                            <!-- each row in rows -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedRight > 0">\n                <!-- fixed body -->\n                <div class="cssFixedContainer" id="fixedRightBodyContainer">\n                    <div class="cssTable">\n                        <div class="cssTableColumnGroup" id="fixedRightBodyColumns">\n                            <!-- each col in fixedCols -->\n                        </div>\n                        <div class="cssTableRowGroup" id="fixedRightBodyRows">\n                            <!-- each row in rows -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n                <div ui-scrollbar ui-scrollbar-options="vScrollbarOptions" style="width:16px;">\n                </div>\n            </div>\n        </div>\n        <div class="cssTableRow">\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedLeft > 0">\n            </div>\n            <div class="cssTableCell">\n                <div ui-scrollbar ui-scrollbar-options="hScrollbarOptions" style="height:16px;">\n                </div>\n            </div>\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedRight > 0">\n            </div>\n            <div class="cssTableCell">\n            </div>\n        </div>\n    </div>\n</div>',
-                    compile:function compile(templateElement, templateAttributes, transclude) {
+                    controller: 'uiTableController',
+                    restrict: 'C',
+                    scope: {uiTableOptions: '='},
+                    template: '<div class="cssTable cssMeasure">\n    <div class="cssTableColumnGroup" id="measureHeadColumns">\n        <!-- each col in cols -->\n    </div>\n    <div class="cssTableRowGroup" id="measureHeadCells">\n        <!-- each row in rows -->\n    </div>\n</div>\n<div class="cssTable cssMeasure">\n    <div class="cssTableColumnGroup" id="measureBodyColumns">\n        <!-- each col in cols -->\n    </div>\n    <div class="cssTableRowGroup" id="measureBodyRows">\n        <!-- each row in rows -->\n    </div>\n</div>\n<div class="cssTable" msd-wheel="onMouseWheel($event, $delta, $deltaX, $deltaY)">\n    <div class="cssTableRowGroup">\n        <div class="cssTableRow" id="headRow">\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedLeft > 0">\n                <!-- fixed left headers -->\n                <div class="cssTable">\n                    <div class="cssTableColumnGroup" id="fixedLeftHeadColumns">\n                        <!-- each col in fixedCols -->\n                    </div>\n                    <div class="cssTableRowGroup">\n                        <div class="cssTableRow" id="fixedLeftHeadCells">\n                            <!-- each col in fixedCols -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n                <!-- scroll headers -->\n                <div class="cssScrollContainer" id="scrollHeadContainer">\n                    <div class="cssTable" id="scrollHeadTable">\n                        <div class="cssTableColumnGroup" id="scrollHeadColumns">\n                            <!-- each col in scrollCols -->\n                        </div>\n                        <div class="cssTableRowGroup">\n                            <div class="cssTableRow" id="scrollHeadCells">\n                                <!-- each col in scrollCols -->\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedRight > 0">\n                <!-- fixed right headers -->\n                <div class="cssTable">\n                    <div class="cssTableColumnGroup" id="fixedRightHeadColumns">\n                        <!-- each col in fixedCols -->\n                    </div>\n                    <div class="cssTableRowGroup">\n                        <div class="cssTableRow" id="fixedRightHeadCells">\n                            <!-- each col in fixedCols -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n            </div>\n        </div>\n        <div class="cssTableRow">\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedLeft > 0">\n                <!-- fixed left body -->\n                <div class="cssFixedContainer" id="fixedLeftBodyContainer">\n                    <div class="cssTable">\n                        <div class="cssTableColumnGroup" id="fixedLeftBodyColumns">\n                            <!-- each col in fixedCols -->\n                        </div>\n                        <div class="cssTableRowGroup" id="fixedLeftBodyRows">\n                            <!-- each row in rows -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n                <!-- scroll body -->\n                <div class="cssScrollContainer" id="scrollBodyContainer" style="float:left;">\n                    <div class="cssTable" id="scrollBodyTable">\n                        <div class="cssTableColumnGroup" id="scrollBodyColumns">\n                            <!-- each col in scrollCols -->\n                        </div>\n                        <div class="cssTableRowGroup" id="scrollBodyRows">\n                            <!-- each row in rows -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedRight > 0">\n                <!-- fixed body -->\n                <div class="cssFixedContainer" id="fixedRightBodyContainer">\n                    <div class="cssTable">\n                        <div class="cssTableColumnGroup" id="fixedRightBodyColumns">\n                            <!-- each col in fixedCols -->\n                        </div>\n                        <div class="cssTableRowGroup" id="fixedRightBodyRows">\n                            <!-- each row in rows -->\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="cssTableCell">\n                <div ui-scrollbar ui-scrollbar-options="vScrollbarOptions" style="width:16px;">\n                </div>\n            </div>\n        </div>\n        <div class="cssTableRow">\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedLeft > 0">\n            </div>\n            <div class="cssTableCell">\n                <div ui-scrollbar ui-scrollbar-options="hScrollbarOptions" style="height:16px;">\n                </div>\n            </div>\n            <div class="cssTableCell" ng-show="numberOfColumnsFixedRight > 0">\n            </div>\n            <div class="cssTableCell">\n            </div>\n        </div>\n    </div>\n</div>',
+                    compile: function compile(templateElement, templateAttributes, transclude) {
                         return {
-                            pre:function (scope, linkElement, attributes, controller) {
+                            pre: function (scope, linkElement, attributes, controller) {
                                 // Helpers.
                                 scope.numberOfColumnsFixedLeft = 0;
                                 scope.numberOfColumnsFixedRight = 0;
@@ -604,23 +656,23 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                                     event.preventDefault();
                                 };
                             },
-                            post:function (scope, linkElement, attributes, controller) {
+                            post: function (scope, linkElement, attributes, controller) {
                                 scope.rows = [];
                                 scope.vScrollbarOptions = {
-                                    vertical:true,
-                                    fullRange:true,
-                                    position:0,
-                                    page:0,
-                                    total:0,
-                                    size:0
+                                    vertical: true,
+                                    fullRange: true,
+                                    position: 0,
+                                    page: 0,
+                                    total: 0,
+                                    size: 0
                                 };
                                 scope.hScrollbarOptions = {
-                                    vertical:false,
-                                    fullRange:false,
-                                    position:0,
-                                    page:0,
-                                    total:0,
-                                    size:0
+                                    vertical: false,
+                                    fullRange: false,
+                                    position: 0,
+                                    page: 0,
+                                    total: 0,
+                                    size: 0
                                 };
                                 scope.linkElement = linkElement;
                                 scope.measureHeadColumns = $('#measureHeadColumns', linkElement);
@@ -682,62 +734,62 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                                     controller.updateLayout();
                                 });
                                 scope.$watch
-                                    (
-                                        function () {
-                                            return scope.scrollHeadContainer.height();
-                                        },
-                                        function (newValue) {
-                                            controller.updateLayout();
-                                        }
-                                    );
+                                (
+                                    function () {
+                                        return scope.scrollHeadContainer.height();
+                                    },
+                                    function (newValue) {
+                                        controller.updateLayout();
+                                    }
+                                );
                                 scope.$watch
-                                    (
-                                        function () {
-                                            return scope.fixedLeftHeadCells.width();
-                                        },
-                                        function (newValue) {
-                                            controller.updateLayout();
-                                        }
-                                    );
+                                (
+                                    function () {
+                                        return scope.fixedLeftHeadCells.width();
+                                    },
+                                    function (newValue) {
+                                        controller.updateLayout();
+                                    }
+                                );
                                 scope.$watch
-                                    (
-                                        function () {
-                                            return scope.fixedRightHeadCells.width();
-                                        },
-                                        function (newValue) {
-                                            controller.updateLayout();
-                                        }
-                                    );
+                                (
+                                    function () {
+                                        return scope.fixedRightHeadCells.width();
+                                    },
+                                    function (newValue) {
+                                        controller.updateLayout();
+                                    }
+                                );
                                 scope.$watch
-                                    (
-                                        function () {
-                                            return scope.measureHeadCells.height();
-                                        },
-                                        function (newValue) {
-                                            $('div.cssTableCellContent', scope.fixedLeftHeadCells).css({height:newValue});
-                                            $('div.cssTableCellContent', scope.fixedRightHeadCells).css({height:newValue});
-                                            $('div.cssTableCellContent', scope.scrollHeadCells).css({height:newValue});
-                                            controller.updateLayout();
-                                        }
-                                    );
+                                (
+                                    function () {
+                                        return scope.measureHeadCells.height();
+                                    },
+                                    function (newValue) {
+                                        $('div.cssTableCellContent', scope.fixedLeftHeadCells).css({height: newValue});
+                                        $('div.cssTableCellContent', scope.fixedRightHeadCells).css({height: newValue});
+                                        $('div.cssTableCellContent', scope.scrollHeadCells).css({height: newValue});
+                                        controller.updateLayout();
+                                    }
+                                );
                                 scope.$watch
-                                    (
-                                        function () {
-                                            return scope.scrollHeadTable.width();
-                                        },
-                                        function (newValue) {
-                                            scope.hScrollbarOptions.total = newValue;
-                                        }
-                                    );
+                                (
+                                    function () {
+                                        return scope.scrollHeadTable.width();
+                                    },
+                                    function (newValue) {
+                                        scope.hScrollbarOptions.total = newValue;
+                                    }
+                                );
                                 scope.$watch
-                                    (
-                                        function () {
-                                            return scope.scrollHeadContainer.width();
-                                        },
-                                        function (newValue) {
-                                            scope.hScrollbarOptions.total = scope.scrollHeadTable.width();
-                                        }
-                                    );
+                                (
+                                    function () {
+                                        return scope.scrollHeadContainer.width();
+                                    },
+                                    function (newValue) {
+                                        scope.hScrollbarOptions.total = scope.scrollHeadTable.width();
+                                    }
+                                );
                                 scope.$watch('hScrollbarOptions.position', function (newValue) {
                                     scope.scrollHeadContainer.scrollLeft(newValue);
                                     scope.scrollBodyContainer.scrollLeft(newValue);
@@ -760,15 +812,15 @@ angular.module('uiTable', ['monospaced.mousewheel'])
         [
             function () {
                 return {
-                    require:'^uiTable',
-                    restrict:'EAC',
-                    scope:false,
-                    template:'',
-                    compile:function compile(templateElement, templateAttributes, transclude) {
+                    require: '^uiTable',
+                    restrict: 'EAC',
+                    scope: false,
+                    template: '',
+                    compile: function compile(templateElement, templateAttributes, transclude) {
                         return {
-                            pre:function (scope, linkElement, attributes, controller) {
+                            pre: function (scope, linkElement, attributes, controller) {
                             },
-                            post:function (scope, linkElement, attributes, controller) {
+                            post: function (scope, linkElement, attributes, controller) {
                                 if (linkElement.parents('div.cssMeasure:first').length > 0) {
                                     return;
                                 }
@@ -801,50 +853,50 @@ angular.module('uiTable', ['monospaced.mousewheel'])
                                         if (scope == lastScrollColumnScope && missingPixels > 0) {
                                             return;
                                         }
-                                        scope.measureHeadColumn.css({width:newWidth});
-                                        scope.measureHeadCellContent.css({width:newWidth});
-                                        scope.headColumn.css({width:newWidth});
-                                        scope.headCellContent.css({width:newWidth});
+                                        scope.measureHeadColumn.css({width: newWidth});
+                                        scope.measureHeadCellContent.css({width: newWidth});
+                                        scope.headColumn.css({width: newWidth});
+                                        scope.headCellContent.css({width: newWidth});
                                         $('.cssTableCell:nth-child(' + (scopeIndex + 1) + ')', scope.measureBodyRows).each(function (i) {
-                                            $(this).children(':first').css({width:newWidth});
+                                            $(this).children(':first').css({width: newWidth});
                                         });
                                         if (scope.column.fixed && scope.column.fixed == 'left') {
                                             $('.cssTableCell:nth-child(' + (scope.headCell.index() + 1) + ')', scope.fixedLeftBodyRows).each(function (i) {
-                                                $(this).children(':first').css({width:newWidth});
+                                                $(this).children(':first').css({width: newWidth});
                                             });
                                         }
                                         else if (scope.column.fixed && scope.column.fixed == 'right') {
                                             $('.cssTableCell:nth-child(' + (scope.headCell.index() + 1) + ')', scope.fixedRightBodyRows).each(function (i) {
-                                                $(this).children(':first').css({width:newWidth});
+                                                $(this).children(':first').css({width: newWidth});
                                             });
                                         }
                                         else {
                                             $('.cssTableCell:nth-child(' + (scope.headCell.index() + 1) + ')', scope.scrollBodyRows).each(function (i) {
-                                                $(this).children(':first').css({width:newWidth});
+                                                $(this).children(':first').css({width: newWidth});
                                             });
                                         }
                                         if (missingPixels > 0) {
                                             var lastWidth = lastScrollColumnScope.width + missingPixels;
-                                            lastScrollColumnScope.measureHeadColumn.css({width:lastWidth});
-                                            lastScrollColumnScope.measureHeadCellContent.css({width:lastWidth});
-                                            lastScrollColumnScope.headColumn.css({width:lastWidth});
-                                            lastScrollColumnScope.headCellContent.css({width:lastWidth});
+                                            lastScrollColumnScope.measureHeadColumn.css({width: lastWidth});
+                                            lastScrollColumnScope.measureHeadCellContent.css({width: lastWidth});
+                                            lastScrollColumnScope.headColumn.css({width: lastWidth});
+                                            lastScrollColumnScope.headCellContent.css({width: lastWidth});
                                             $('.cssTableCell:nth-child(' + (lastScrollColumnScope.headCell.index() + 1) + ')', scope.measureBodyRows).each(function (i) {
-                                                $(this).children(':first').css({width:lastWidth});
+                                                $(this).children(':first').css({width: lastWidth});
                                             });
                                             if (lastScrollColumnScope.column.fixed && lastScrollColumnScope.column.fixed == 'left') {
                                                 $('.cssTableCell:nth-child(' + (lastScrollColumnScope.headCell.index() + 1) + ')', scope.fixedLeftBodyRows).each(function (i) {
-                                                    $(this).children(':first').css({width:lastWidth});
+                                                    $(this).children(':first').css({width: lastWidth});
                                                 });
                                             }
                                             else if (lastScrollColumnScope.column.fixed && lastScrollColumnScope.column.fixed == 'right') {
                                                 $('.cssTableCell:nth-child(' + (lastScrollColumnScope.headCell.index() + 1) + ')', scope.fixedRightBodyRows).each(function (i) {
-                                                    $(this).children(':first').css({width:lastWidth});
+                                                    $(this).children(':first').css({width: lastWidth});
                                                 });
                                             }
                                             else {
                                                 $('.cssTableCell:nth-child(' + (lastScrollColumnScope.headCell.index() + 1) + ')', scope.scrollBodyRows).each(function (i) {
-                                                    $(this).children(':first').css({width:lastWidth});
+                                                    $(this).children(':first').css({width: lastWidth});
                                                 });
                                             }
                                         }
@@ -885,17 +937,17 @@ angular.module('uiTable', ['monospaced.mousewheel'])
         [
             function () {
                 return {
-                    replace:true,
-                    require:'^uiTable',
-                    restrict:'EAC',
-                    scope:false,
-                    template:'<span ng-transclude=""></span>',
-                    transclude:true,
-                    compile:function compile(templateElement, templateAttributes, transclude) {
+                    replace: true,
+                    require: '^uiTable',
+                    restrict: 'EAC',
+                    scope: false,
+                    template: '<span ng-transclude=""></span>',
+                    transclude: true,
+                    compile: function compile(templateElement, templateAttributes, transclude) {
                         return {
-                            pre:function (scope, linkElement, attributes, controller) {
+                            pre: function (scope, linkElement, attributes, controller) {
                             },
-                            post:function (scope, linkElement, attributes, controller) {
+                            post: function (scope, linkElement, attributes, controller) {
                                 if (linkElement.parents('div.cssMeasure:first').length > 0) {
                                     return;
                                 }
@@ -945,17 +997,17 @@ angular.module('uiTable', ['monospaced.mousewheel'])
         [
             function () {
                 return {
-                    replace:true,
-                    require:'^uiTable',
-                    restrict:'EAC',
-                    scope:false,
-                    template:'<span ng-transclude=""></span>',
-                    transclude:true,
-                    compile:function compile(templateElement, templateAttributes, transclude) {
+                    replace: true,
+                    require: '^uiTable',
+                    restrict: 'EAC',
+                    scope: false,
+                    template: '<span ng-transclude=""></span>',
+                    transclude: true,
+                    compile: function compile(templateElement, templateAttributes, transclude) {
                         return {
-                            pre:function (scope, linkElement, attributes, controller) {
+                            pre: function (scope, linkElement, attributes, controller) {
                             },
-                            post:function (scope, linkElement, attributes, controller) {
+                            post: function (scope, linkElement, attributes, controller) {
                                 if (linkElement.parents('div.cssMeasure:first').length > 0) {
                                     return;
                                 }
@@ -1005,42 +1057,42 @@ angular.module('uiTable', ['monospaced.mousewheel'])
             '$window', '$timeout', '$rootScope',
             function ($window, $timeout, $rootScope) {
                 return {
-                    replace:true,
-                    restrict:'EAC',
-                    scope:{uiScrollbarOptions:'='},
-                    template:'<div class="uiScrollbarOuter">\n    <div class="uiScrollbarInner"></div>\n</div>',
-                    compile:function compile(templateElement, templateAttributes, transclude) {
+                    replace: true,
+                    restrict: 'EAC',
+                    scope: {uiScrollbarOptions: '='},
+                    template: '<div class="uiScrollbarOuter">\n    <div class="uiScrollbarInner"></div>\n</div>',
+                    compile: function compile(templateElement, templateAttributes, transclude) {
                         return {
-                            pre:function (scope, linkElement, attributes, controller) {
+                            pre: function (scope, linkElement, attributes, controller) {
                             },
-                            post:function (scope, linkElement, attributes, controller) {
+                            post: function (scope, linkElement, attributes, controller) {
                                 var outer = linkElement;
                                 var inner = $('div.uiScrollbarInner', linkElement);
                                 var update = function () {
                                     var range = scope.uiScrollbarOptions.fullRange ? scope.uiScrollbarOptions.page - 1 : 0;
                                     if (scope.uiScrollbarOptions.vertical === true) {
-                                        outer.css({height:scope.uiScrollbarOptions.size});
+                                        outer.css({height: scope.uiScrollbarOptions.size});
                                         inner.css
-                                            (
-                                                {
-                                                    left:0,
-                                                    top:Math.ceil(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.position / (scope.uiScrollbarOptions.total + range)),
-                                                    width:outer.width(),
-                                                    height:Math.floor(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.page / (scope.uiScrollbarOptions.total + range))
-                                                }
-                                            );
+                                        (
+                                            {
+                                                left: 0,
+                                                top: Math.ceil(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.position / (scope.uiScrollbarOptions.total + range)),
+                                                width: outer.width(),
+                                                height: Math.floor(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.page / (scope.uiScrollbarOptions.total + range))
+                                            }
+                                        );
                                     }
                                     else {
-                                        outer.css({width:scope.uiScrollbarOptions.size});
+                                        outer.css({width: scope.uiScrollbarOptions.size});
                                         inner.css
-                                            (
-                                                {
-                                                    top:0,
-                                                    left:Math.ceil(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.position / (scope.uiScrollbarOptions.total + range)),
-                                                    height:outer.height(),
-                                                    width:Math.floor(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.page / (scope.uiScrollbarOptions.total + range))
-                                                }
-                                            );
+                                        (
+                                            {
+                                                top: 0,
+                                                left: Math.ceil(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.position / (scope.uiScrollbarOptions.total + range)),
+                                                height: outer.height(),
+                                                width: Math.floor(scope.uiScrollbarOptions.size * scope.uiScrollbarOptions.page / (scope.uiScrollbarOptions.total + range))
+                                            }
+                                        );
                                     }
                                 };
                                 scope.$watch('uiScrollbarOptions', function (newValue) {
@@ -1101,11 +1153,11 @@ angular.module('uiTable', ['monospaced.mousewheel'])
         [
             function () {
                 return {
-                    transclude:'element',
-                    priority:1000,
-                    terminal:true,
-                    restrict:'A',
-                    compile:function (element, attr, transclude) {
+                    transclude: 'element',
+                    priority: 1000,
+                    terminal: true,
+                    restrict: 'A',
+                    compile: function (element, attr, transclude) {
                         return function (scope, element, attr) {
 
                             var childElement;
