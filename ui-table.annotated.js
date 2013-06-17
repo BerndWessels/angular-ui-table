@@ -220,10 +220,12 @@
         }
       };
       controller.createRow = function (rowIndex, rowData) {
-        var measureRowHtml = '<div class="cssTableRow">';
-        var fixedLeftRowHtml = '<div class="cssTableRow">';
-        var fixedRightRowHtml = '<div class="cssTableRow">';
-        var scrollRowHtml = '<div class="cssTableRow">';
+        var selection = $scope.uiTableOptions.selection[rowIndex];
+        var isSelected = selection ? selection.isSelected : false;
+        var measureRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
+        var fixedLeftRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
+        var fixedRightRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
+        var scrollRowHtml = '<div class="cssTableRow' + (isSelected ? ' selected">' : '">');
         $.each($scope.columnScopes, function (index, columnScope) {
           var dataTemplate = columnScope.column.dataTemplate && columnScope.column.dataTemplate.length > 0 ? columnScope.column.dataTemplate : '<span ng-bind="row.data.' + columnScope.column.field + '"></span>';
           if ($scope.uiTableOptions.noCellBinding) {
@@ -242,7 +244,8 @@
         var rowScope = $scope.$new();
         rowScope.row = {
           index: rowIndex,
-          data: rowData
+          data: rowData,
+          isSelected: isSelected
         };
         if ($scope.uiTableOptions.noCellBinding) {
           if ($scope.numberOfColumnsFixedLeft > 0) {
@@ -278,6 +281,9 @@
               }
               rowScope.scrollRowElement.removeClass('mouseover');
             });
+            rowScope.fixedLeftRowElement.bind('click.cssTableRow', function (event) {
+              controller.onClickRow(event, rowScope);
+            });
           }
           if (rowScope.fixedRightRowElement) {
             rowScope.fixedRightRowElement.bind('mouseenter.cssTableRow', function () {
@@ -293,6 +299,9 @@
                 rowScope.fixedLeftRowElement.removeClass('mouseover');
               }
               rowScope.scrollRowElement.removeClass('mouseover');
+            });
+            rowScope.fixedRightRowElement.bind('click.cssTableRow', function (event) {
+              controller.onClickRow(event, rowScope);
             });
           }
           rowScope.scrollRowElement.bind('mouseenter.cssTableRow', function () {
@@ -312,6 +321,9 @@
               rowScope.fixedRightRowElement.removeClass('mouseover');
             }
             rowScope.scrollRowElement.removeClass('mouseover');
+          });
+          rowScope.scrollRowElement.bind('click.cssTableRow', function (event) {
+            controller.onClickRow(event, rowScope);
           });
         }
         if ($scope.rows.length === 0) {
@@ -449,6 +461,38 @@
           newPosition = $scope.hScrollbarOptions.total - $scope.hScrollbarOptions.page;
           $scope.hScrollbarOptions.position = newPosition < 0 ? 0 : newPosition;
         }
+      };
+      controller.onClickRow = function (event, rowScope) {
+        $scope.$apply(function () {
+          if (event.shiftKey === false && event.ctrlKey === false) {
+            $scope.uiTableOptions.selection.length = 0;
+            $.each($scope.rows, function (index, iRowScope) {
+              if (iRowScope.row.isSelected) {
+                iRowScope.row.isSelected = false;
+                if (iRowScope.fixedLeftRowElement) {
+                  iRowScope.fixedLeftRowElement.removeClass('selected');
+                }
+                if (iRowScope.fixedRightRowElement) {
+                  iRowScope.fixedRightRowElement.removeClass('selected');
+                }
+                iRowScope.scrollRowElement.removeClass('selected');
+              }
+            });
+            $scope.uiTableOptions.selection[rowScope.row.index] = rowScope.row;
+            if (!rowScope.row.isSelected) {
+              rowScope.row.isSelected = true;
+              if (rowScope.fixedLeftRowElement) {
+                rowScope.fixedLeftRowElement.addClass('selected');
+              }
+              if (rowScope.fixedRightRowElement) {
+                rowScope.fixedRightRowElement.addClass('selected');
+              }
+              rowScope.scrollRowElement.addClass('selected');
+            }
+          } else if (event.shiftKey === true && event.ctrlKey === false) {
+          } else if (event.ctrlKey === false) {
+          }
+        });
       };
       controller.currentMouseColumnScope = null;
     }
