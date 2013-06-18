@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="uiTableDemo" ng-controller="AppCtrl">
 <head>
-    <title>Sample 1 | ui-table</title>
+    <title>ui-table</title>
 
     <meta property="og:title" content="uiTable"/>
     <meta property="og:type" content="website"/>
@@ -21,8 +21,18 @@
     <!-- your compiled CSS -->
     <link rel="stylesheet" type="text/css" href="<%= grunt.config.get('pkg.name') %>-demo.css"/>
 
+    <!-- external CSS -->
+    <!--
+    <link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.css"/>
+    -->
+
     <!-- libs.js contains all of the concatenated third-party libraries -->
     <script type="text/javascript" src="libs.js"></script>
+
+    <!-- external JS -->
+    <!--
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js"></script>
+    -->
 
     <!-- this is your compiled, minified application code -->
     <script type="text/javascript" src="<%= grunt.config.get('pkg.name') %>.js"></script>
@@ -49,97 +59,275 @@
                                 var controller = this;
                                 // The table options.
                                 var options = {
-                                    //noCellBinding: true,  // use this on IE8 or very slow hardware. Your cells will not be data bound but use simple string replacement.
-                                    //rowsHeight:24,        // use this to disable the dynamic row height feature (improves performance).
-                                    columnsWidth:2000,      // use this to set the available with for all columns (useful for star-based layouts).
-                                    columns:[],
-                                    data:[]                 // can be an array of row data or a function that receives the row index and returns the data for the requested row.
-                                    //total:100             // in case data is a function, total has to indicate the total number of rows available.
+                                    // use this on IE8 or very slow hardware.
+                                    // Your cells will not be data bound but use simple string replacement.
+                                    //noCellBinding: true,
+                                    // use this to disable the dynamic row height feature
+                                    // (improves performance).
+                                    //rowsHeight:24,
+                                    // use this to set the available with for all columns
+                                    // (useful for star-based layouts).
+                                    // columnsWidth: 1600,
+                                    columns: [],
+                                    // can be an array of row data or a function that receives the row index
+                                    // and returns the data for the requested row.
+                                    data: [],
+                                    // in case data is a function,
+                                    // total has to indicate the total number of rows available.
+                                    //total:100
+                                    // the selected rows data.
+                                    selection: [],
+                                    // allow the selection of multiple rows with the
+                                    // SHIFT and CTRL keys.
+                                    allowMultiSelection: true,
+                                    // Use headTemplate to define the column header cell template.
+                                    // Use dataTemplate to define the data cell template for this column.
+                                    columns: [
+                                        {
+                                            title: 'First Name', field: 'firstName',
+                                            sort: '', sortOrder: 0,
+                                            width: '4*', fixed: '',
+                                            headTemplate: '', dataTemplate: ''
+                                        },
+                                        {
+                                            title: 'Last Name', field: 'lastName',
+                                            sort: '', sortOrder: 0,
+                                            width: '1*', fixed: '',
+                                            headTemplate: '', dataTemplate: ''
+                                        },
+                                        {
+                                            title: 'Age', field: 'age',
+                                            sort: '', sortOrder: 0,
+                                            width: '1*', fixed: '',
+                                            headTemplate: '', dataTemplate: ''
+                                        }
+                                    ],
+                                    // can be an array of row data or a function
+                                    // that receives the row index and
+                                    // returns the data for the requested row.
+                                    data: [
+                                        {firstName: "Walter", lastName: "Wurst", age: 20},
+                                        {firstName: "Peter", lastName: "Pan", age: 21},
+                                        {firstName: "Erwin", lastName: "Erster", age: 22},
+                                        {firstName: "Paula", lastName: "Pummel", age: 23}
+                                    ],
                                 };
-                                for (var j = 0; j < 4; j++) {
-                                    options.columns.push({
-                                        title:'title ' + j + ' bernd',
-                                        field:'field' + j,
-                                        sort:'asc',
-                                        sortOrder:j + 1,
-                                        width:'50',
-                                        fixed:'left',
-                                        headTemplate:'',
-                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
-                                    });
-                                }
-                                for (; j < 10; j++) {
-                                    options.columns.push({
-                                        title:'title ' + j + ' bernd',
-                                        field:'field' + j,
-                                        sort:'',
-                                        sortOrder:0,
-                                        width:'50',
-                                        fixed:'',
-                                        headTemplate:'',
-                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
-                                    });
-                                }
-                                for (; j < 12; j++) {
-                                    options.columns.push({
-                                        title:'title ' + j + ' bernd',
-                                        field:'field' + j,
-                                        sort:'',
-                                        sortOrder:0,
-                                        width:'50',
-                                        fixed:'right',
-                                        headTemplate:'',
-                                        dataTemplate:''//'<span>{{field' + j + '}}</span>'
-                                    });
-                                }
-                                options.columns[2].width = '2*';
-                                options.columns[5].width = '1*';
-                                options.columns[11].width = '1*';
-                                for (var i = 0; i < 1000; i++) {
-                                    var data = {};
-                                    for (var j = 0; j < 20; j++) {
-                                        data['field' + j] = i + ':' + j;
-                                    }
-                                    options.data.push(data);
-                                }
-                                options.columns[6].headTemplate = '<span>*<span ng-bind="column.title"></span>*</span>';
-                                options.columns[7].dataTemplate = '<span>*<span ng-bind="row.data.field7"></span>*</span>';
+                                // Set a data cell template.
+                                options.columns[2].dataTemplate = '<span><span ng-bind="row.data.age"></span> years old.</span>';
+                                // Assign the options.
                                 $scope.tableOptions = options;
-                                $scope.onClack = function () {
-                                    $scope.tableOptions.data[4]['field4'] = 'Brummmmmmmmm';
-                                    $scope.tableOptions.scrollV = 11;
-                                };
-                                $scope.onClick = function () {
-                                    $scope.tableOptions.data[4]['field4'] += ' dfg';
-                                };
                             }
                         ]
                 )
                 .directive
-                (
-                        'plusOne',
-                        function () {
-                            return {
-                                link:function (scope, element, attrs) {
-                                    gapi.plusone.render(element[0], {
-                                                "size":"medium",
-                                                "href":"http://bit.ly/uiTable"
-                                            }
-                                    );
-                                }
-                            };
+        (
+                'plusOne',
+                function () {
+                    return {
+                        link: function (scope, element, attrs) {
+                            gapi.plusone.render(element[0], {
+                                        "size": "medium",
+                                        "href": "http://bit.ly/uiTable"
+                                    }
+                            );
                         }
-                );
+                    };
+                }
+        );
     </script>
 </head>
-<body>
-<input class="btn" type="button" ng-click="onClick()" value="click"/>
-<input class="btn" type="button" ng-click="onClack()" value="clack"/>
-<br/>
-
-<div style="margin: 20px; background-color: white; width: 70%; height: 80%; position: relative;">
-    <div class="uiTable" ui-table-options="tableOptions" style="width:100%; height: 100%;">
+<body onload="prettyPrint();">
+<!-- HOME -->
+<div class="section-cover">
+    <div class="section-inner jumbotron">
+        <div class="container">
+            <div class="brand">uiTable</div>
+            <div class="social-buttons">
+                <ul class="inline">
+                    <li>
+                        <iframe
+                                src="http://ghbtns.com/github-btn.html?user=joshdmiller&amp;repo=angular-ui-table&amp;type=watch&amp;count=true"
+                                allowtransparency="true"
+                                frameborder="0"
+                                scrolling="0"
+                                width="110"
+                                height="20">
+                        </iframe>
+                    </li>
+                    <li>
+                        <iframe
+                                src="http://ghbtns.com/github-btn.html?user=joshdmiller&amp;repo=angular-ui-table&amp;type=fork&amp;count=true"
+                                allowtransparency="true"
+                                frameborder="0"
+                                scrolling="0"
+                                width="95"
+                                height="20">
+                        </iframe>
+                    </li>
+                    <li>
+                        <iframe allowtransparency="true" frameborder="0" scrolling="no"
+                                src="https://platform.twitter.com/widgets/tweet_button.html?url=http%3A%2F%2Fbit.ly%2Fui&counturl=http%3A%2F%2Fjoshdmiller.github.io%2Fangular-ui-table&text=Check%20out%20angular-ui-table%20-%20a%20wicked-cool%20unrolling%20effect%20for%20web%20sites%20%7C&hashtags=angularjs&via=joshdmiller&related=joshdmiller"
+                                style="width:130px; height:20px;"></iframe>
+                    </li>
+                    <li plus-one></li>
+                    <li>
+                        <div id="fb-root"></div>
+                        <script>(function (d, s, id) {
+                            var js, fjs = d.getElementsByTagName(s)[0];
+                            if (d.getElementById(id)) return;
+                            js = d.createElement(s);
+                            js.id = id;
+                            js.src = "http://connect.facebook.net/en_US/all.js#xfbml=1";
+                            fjs.parentNode.insertBefore(js, fjs);
+                        }(document, 'script', 'facebook-jssdk'));</script>
+                        <fb:like href="http://bit.ly/uiTable" send="true" layout="button_count" width="90"
+                                 show_faces="true"></fb:like>
+                    </li>
+                    <li>
+                        <script src="http://platform.linkedin.com/in.js" type="text/javascript">
+                            lang: en_US
+                        </script>
+                        <script type="IN/Share" data-url="http://bit.ly/uiTable" data-counter="right"></script>
+                    </li>
+                </ul>
+            </div>
+            <div class="tagline">
+                A faster and better <a href="http://angularjs.org">AngularJS</a> data grid.
+            </div>
+            <div class="tagline">
+                Trust me (Bernd Wessels). It's epic.
+            </div>
+        </div>
     </div>
 </div>
+<br/>
+<ul class="nav nav-tabs">
+    <li><a href="index.html">Overview</a></li>
+    <li class="active"><a href="#">Bound Cells</a></li>
+    <li><a href="#">Unbound Cells</a></li>
+    <li><a href="#">Fixed Row Height</a></li>
+    <li><a href="#">On Demand</a></li>
+    <li><a href="#">Hierarchical</a></li>
+</ul>
+<div style="float: left; width: 49%;">
+    <h2>Cell Rendering</h2>
+
+    <p>In bound mode all table cells are rendered as AngularJS components and therefore bound to the underlying data
+        source.</p>
+
+    <p>Each column can have it's own cell template. If you do not set a template it will use the default one.</p>
+
+    <p>Type something in the input field and see that the grid cell updates automagically. Also notice that if you keep
+        on typing, that the rows height automagically adjusts to the content.</p>
+
+    <h2>CSS</h2>
+    <pre class="prettyprint lang-css linenums">
+        .gridStyle {
+            border: 1px solid rgb(212,212,212);
+            width: 800px;
+            height: 400px;
+        }
+    </pre>
+    <h2>HTML</h2>
+    <pre class="prettyprint lang-html linenums">
+        &lt;html ng-app="myApp"&gt;
+            &lt;head lang="en"&gt;
+                &lt;meta charset="utf-8"&gt;
+                &lt;title&gt;Getting Started With uiTable Example&lt;/title&gt;
+                &lt;link rel="stylesheet" type="text/css" href="ui-table.css"/&gt;
+                &lt;link rel="stylesheet" type="text/css" href="style.css"/&gt;
+                &lt;script type="text/javascript" src="jquery.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="angular.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="hamster.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="mousewheel.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="ui-table.js"&gt;&lt;/script&gt;
+            &lt;/head&gt;
+            &lt;body ng-controller="MyCtrl"&gt;
+                &lt;div style="margin-left: auto; margin-right: auto; position: relative;"&gt;
+                    &lt;input type="text" ng-model="tableOptions.data[2].lastName"/&gt;
+                &lt;/div&gt;
+                &lt;div class="gridStyle" ui-table="tableOptions"&gt;
+                &lt;/div&gt;
+            &lt;/body&gt;
+        &lt;/html&gt;
+    </pre>
+</div>
+
+<div style="float: right; width: 49%;">
+    <h2>JavaScript</h2>
+    <pre class="prettyprint lang-js linenums">
+        // main.js
+        var app = angular.module('myApp', ['uiTable']);
+        app.controller('MyCtrl', function($scope) {
+            $scope.tableOptions = {
+                // Use this on IE8 or very slow hardware.
+                // Your cells will not be data bound
+                // but use simple string replacement.
+                //noCellBinding: true,
+                // Use this to disable the dynamic row height feature
+                // (improves rendering performance).
+                //rowsHeight:24,
+                // use this to set the available with for all columns
+                // (useful for star-based layouts).
+                //columnsWidth:1600,
+                // Use headTemplate to define the column header cell template.
+                // Use dataTemplate to define the data cell template for this column.
+                columns:[
+                    {
+                        title:'First Name', field:'firstName',
+                        sort:'', sortOrder:0,
+                        width:'1*', fixed:'',
+                        headTemplate:'', dataTemplate:''
+                    },
+                    {
+                        title:'Last Name', field:'lastName',
+                        sort:'', sortOrder:0,
+                        width:'2*', fixed:'',
+                        headTemplate:'', dataTemplate:''
+                    },
+                    {
+                        title:'First Name', field:'firstName',
+                        sort:'', sortOrder:0,
+                        width:'50px', fixed:'',
+                        headTemplate:'', dataTemplate:''
+                    }
+                ],
+                // can be an array of row data or a function
+                // that receives the row index and
+                // returns the data for the requested row.
+                data:[
+                    {firstName:"Walter", lastName:"Wurst", age:20},
+                    {firstName:"Peter", lastName:"Pan", age:21},
+                    {firstName:"Erwin", lastName:"Erster", age:22},
+                    {firstName:"Paula", lastName:"Pummel", age:23}
+                ],
+                // in case data is a function,
+                // total has to indicate the total number of rows available.
+                //total:100,
+                // the selected rows data.
+                selection: [],
+                // allow the selection of multiple rows with the
+                // SHIFT and CTRL keys.
+                allowMultiSelection: true
+            };
+        });
+    </pre>
+</div>
+
+<div style="clear: both;">
+    <hr/>
+    <div style="margin-left: auto; margin-right: auto; position: relative;">
+        <label>Bound to "data[2].lastName":</label>
+        <input type="text" ng-model="tableOptions.data[2].lastName"/>
+    </div>
+    <hr/>
+    <div style="margin-left: auto; margin-right: auto; width: 80%; height: 400px; position: relative;">
+        <div class="uiTable" ui-table-options="tableOptions" style="width:100%; height: 100%;">
+        </div>
+    </div>
+</div>
+
+<br/>
+
 </body>
 </html>
